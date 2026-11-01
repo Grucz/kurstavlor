@@ -166,4 +166,4 @@ export default async (req) => {
   return fel("Ingen förhandsbild hittades för den här länken.");
 };
 
-export const config = { path: "/api/forhandsbild" };
+export const config = { path: "/bygg/api/forhandsbild" };

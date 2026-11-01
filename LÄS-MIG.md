@@ -13,7 +13,8 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 | `mall/profiler.js` | Kontaktuppgifter, välkomsttexter och sajtens adress |
 | `mall/profiler/` | Logotyper och porträtt |
 | `interkulturell-kommunikation-tandvarden/` | Exempeltavla återskapad från Padlet |
-| `verktyg/lista-tavlor.mjs` | Skapar `tavlor.json` (listan över tavlor i byggaren) vid varje publicering |
+| `verktyg/lista-tavlor.mjs` | Skapar `bygg/tavlor.json` (listan över tavlor i byggaren) vid varje publicering |
+| `netlify/edge-functions/skydd.js` | Lösenordsskydd för allt under `/bygg/` |
 | `netlify/functions/forhandsbild.mjs` | Hämtar förhandsbilder till länkar (används bara av byggaren) |
 | `netlify.toml`, `robots.txt` | Inställningar för Netlify, håller tavlorna borta från sökmotorer |
 
@@ -23,11 +24,14 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 2. Ladda upp allt innehåll i den här mappen till repot (Add file, Upload files).
 3. Skapa en ny sajt på Netlify från repot. Byt sajtens namn till `kurstavlor` under Site configuration.
    Om namnet är upptaget: välj ett annat och ändra `webbadress` i `mall/profiler.js`.
-4. Porträtt och logotyper ligger redan på plats i `mall/profiler/`. Byt fil med samma namn om du vill ändra något.
+4. Sätt lösenordet till byggaren: i Netlify, gå till Site configuration, Environment variables, Add a variable.
+   Namn: `KURSTAVLOR_LOSENORD`. Värde: ett lösenord du väljer. Spara och välj sedan Deploys, Trigger deploy, Deploy site.
+   Utan variabeln är byggaren låst för alla, även för dig.
+5. Porträtt och logotyper ligger redan på plats i `mall/profiler/`. Byt fil med samma namn om du vill ändra något.
 
 ## Ny tavla
 
-1. Öppna `kurstavlor.netlify.app/bygg/`.
+1. Öppna `kurstavlor.netlify.app/bygg/`. Webbläsaren frågar efter användarnamn och lösenord: användarnamnet spelar ingen roll, lösenordet är det du satte i Netlify.
 2. Välj Ny tavla, eller Tidigare tavla som mall och klistra in adressen till en gammal tavla.
 3. Fyll i, titta under Förhandsvisa, klicka Ladda ner tavlan.
 4. Packa upp zip-filen och dra mappen till repot på GitHub i en enda uppladdning.
@@ -53,6 +57,8 @@ Funktionen fungerar bara när sajten ligger på Netlify, inte när byggaren öpp
 
 ## Bra att veta
 
+- Byggaren, listan över tavlor och förhandsbildsfunktionen är lösenordsskyddade. Tavlorna är öppna för alla som har länken.
+- Byter du lösenord i Netlify måste sajten publiceras om (Trigger deploy) innan det nya gäller.
 - Listan över tavlor uppdateras automatiskt när Netlify publicerar. Tar du bort en tavelmapp försvinner den ur listan.
 
 - Filer större än 25 MB går inte att ladda upp via GitHub i webbläsaren. Lägg dem i Dropbox och använd länk.

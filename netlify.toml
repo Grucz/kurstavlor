@@ -1,14 +1,24 @@
 # Kurstavlor: sajten publiceras som den är. Vid varje publicering skapas
-# tavlor.json (förteckningen över alla tavlor som byggaren visar).
+# bygg/tavlor.json (förteckningen över alla tavlor som byggaren visar).
 [build]
   publish = "."
   command = "node verktyg/lista-tavlor.mjs"
+  # Lösenordsskydd för allt under /bygg/ (se netlify/edge-functions/skydd.js).
+  # Lösenordet sätts som miljövariabeln KURSTAVLOR_LOSENORD i Netlify.
+  edge_functions = "netlify/edge-functions"
 
 # Funktionen som hämtar förhandsbilder till byggaren.
 [functions]
   directory = "netlify/functions"
 
-# Funktionens källkod ska inte gå att läsa som vanlig fil.
+# Byggaren ska alltid öppnas med snedstreck på slutet.
+[[redirects]]
+  from = "/bygg"
+  to = "/bygg/"
+  status = 301
+  force = true
+
+# Funktionernas och verktygens källkod ska inte gå att läsa som vanliga filer.
 [[redirects]]
   from = "/netlify/*"
   to = "/"

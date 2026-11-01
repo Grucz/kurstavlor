@@ -1,5 +1,6 @@
 /*
-  Kurstavlor: skapar tavlor.json, en förteckning över alla tavlor.
+  Kurstavlor: skapar bygg/tavlor.json, en förteckning över alla tavlor.
+  Ligger under /bygg/ så att den skyddas av samma lösenord som byggaren.
   Körs automatiskt av Netlify vid varje publicering (se netlify.toml).
   Byggaren läser förteckningen och visar tavlorna på startsidan.
   Kräver bara Node, inga paket.
@@ -32,5 +33,5 @@ for (const namn of readdirSync(ROT)) {
   }
 }
 
-writeFileSync(join(ROT, "tavlor.json"), JSON.stringify({ genererad: new Date().toISOString(), tavlor }, null, 2) + "\n");
-console.log("tavlor.json: " + tavlor.length + " tavlor");
+writeFileSync(join(ROT, "bygg", "tavlor.json"), JSON.stringify({ genererad: new Date().toISOString(), tavlor }, null, 2) + "\n");
+console.log("bygg/tavlor.json: " + tavlor.length + " tavlor");

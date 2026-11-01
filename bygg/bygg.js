@@ -15,7 +15,11 @@
   var VARNA_FIL = 10 * 1024 * 1024; // stora filer drar Netlify-krediter vid nedladdning
   var BILD_MAX_BREDD = 1000;
   // Funktionen på Netlify som hämtar förhandsbilder (se netlify/functions/forhandsbild.mjs).
-  var FORHANDSBILD_API = INST.webbadress.replace(/\/$/, "") + "/api/forhandsbild";
+  // På Netlify används relativa adresser, så att webbläsaren skickar med lösenordet.
+  var BYGG_BAS = /^https?:$/.test(location.protocol) ? "/bygg/" : INST.webbadress.replace(/\/$/, "") + "/bygg/";
+  var FORHANDSBILD_API = BYGG_BAS + "api/forhandsbild";
+  // Sajtens adress: den byggaren körs på, annars adressen i profiler.js.
+  var SAJT = /^https?:$/.test(location.protocol) ? location.origin : INST.webbadress.replace(/\/$/, "");
   var KALLNAMN = { youtube: "Bild från YouTube", delningsbild: "Sidans delningsbild", skarmdump: "Skärmdump av sidan" };
 
   var TAVLA_INDEX =
@@ -812,7 +816,7 @@
       if (!lista.length) return;
       h += '<section class="b-listgrupp"><h3>' + pr[1] + ' <span class="b-kat-antal">' + lista.length + "</span></h3><ul>";
       lista.forEach(function (t) {
-        var adress = INST.webbadress.replace(/\/$/, "") + "/" + t.slug + "/";
+        var adress = SAJT + "/" + t.slug + "/";
         var arkiv = t.slutdatum && idag > t.slutdatum;
         var datum = visaDatum(tavlansDatum(t));
         h += '<li class="b-listrad">' +
@@ -832,7 +836,7 @@
 
   function laddaTavellista() {
     var r = $("#b-lista-innehall");
-    fetch(INST.webbadress.replace(/\/$/, "") + "/tavlor.json", { cache: "no-store" })
+    fetch(BYGG_BAS + "tavlor.json", { cache: "no-store" })
       .then(function (svar) { if (!svar.ok) throw new Error(); return svar.json(); })
       .then(function (data) { allaTavlor = data.tavlor || []; ritaTavellista(); })
       .catch(function () {
@@ -844,7 +848,7 @@
       if (!b) return;
       $("#b-start-fel").textContent = "";
       b.disabled = true;
-      var adress = INST.webbadress.replace(/\/$/, "") + "/" + b.getAttribute("data-slug") + "/";
+      var adress = SAJT + "/" + b.getAttribute("data-slug") + "/";
       hamtaFranAdress(adress, b.getAttribute("data-lista")).catch(function (err) {
         b.disabled = false;
         $("#b-start-fel").textContent = err.message || String(err);
