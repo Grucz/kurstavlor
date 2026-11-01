@@ -11,13 +11,6 @@
 [functions]
   directory = "netlify/functions"
 
-# Byggaren ska alltid öppnas med snedstreck på slutet.
-[[redirects]]
-  from = "/bygg"
-  to = "/bygg/"
-  status = 301
-  force = true
-
 # Funktionernas och verktygens källkod ska inte gå att läsa som vanliga filer.
 [[redirects]]
   from = "/netlify/*"
