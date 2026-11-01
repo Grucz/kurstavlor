@@ -37,7 +37,6 @@
           "rubrik": "Checka in",
           "text": "Ett verktyg för uppstart av konferens, möte eller kurs. Man väljer önskade kategorier och frågor slumpas fram.",
           "lank": "https://checkinfragor.netlify.app",
-          "farg": "mork",
           "typ": "webb"
         },
         {
@@ -45,7 +44,6 @@
           "rubrik": "Värderingsdiskussion",
           "text": "På denna sida kan du slumpa fram olika påståenden. Deltagarna kan sedan i ord eller med skyltar eller genom att placera sig i rummet välja JA, NEJ eller ANNAT. Sedan kan man ta samtal om olika förhållningssätt till frågorna.",
           "lank": "https://varderingskort.netlify.app",
-          "farg": "mork",
           "typ": "webb"
         },
         {
@@ -53,7 +51,6 @@
           "rubrik": "Dilemmascenarier",
           "text": "Via denna länk kommer du till en sida med olika interkulturella dilemmasituationer. Man klickar fram dem ett i taget och kan även ställa in en timer på 3 till 10 minuter för att styra samtalstiden.",
           "lank": "https://diskussionsspel.netlify.app",
-          "farg": "mork",
           "typ": "webb"
         }
       ]
@@ -70,29 +67,25 @@
           "fil": "filer/K3P1-ledarskap-for-inkludering.pdf",
           "filnamn": "Ledarskap för inkludering.pdf",
           "filstorlek": 1606766,
-          "farg": "f3",
           "typ": "pdf"
         },
         {
           "id": "p-kult01",
           "rubrik": "Bok: Kulturmöten, en introduktion till interkulturella studier",
           "text": "En bra grundbok på svenska som introduktion till fältet interkulturella studier. Detta är tredje upplagan av boken och kom ut 2019.",
-          "bild": "filer/K3P2-bild.jpg",
-          "farg": "f3"
+          "bild": "filer/K3P2-bild.jpg"
         },
         {
           "id": "p-dive01",
           "rubrik": "Bok: Diversity competence",
           "text": "Väldigt bra och gedigen teoretisk bok om ämnet. Boken varvar teorierna med en lång rad praktiska exempel.\n\nIn English.",
-          "bild": "filer/K3P3-bild.jpg",
-          "farg": "f3"
+          "bild": "filer/K3P3-bild.jpg"
         },
         {
           "id": "p-inte01",
           "rubrik": "Integration bland unga: en mångkulturell generation växer upp",
           "text": "Sverige har, på bara ett par tre decennier, blivit ett mångkulturellt samhälle. Bland unga i dag, som bygger framtidens Sverige, har mer än var fjärde utländsk bakgrund. Författarna till denna bok har följt över 5 000 unga genom deras tonårsperiod till det tidiga vuxenlivet.",
-          "bild": "filer/K3P4-bild.jpg",
-          "farg": "f3"
+          "bild": "filer/K3P4-bild.jpg"
         }
       ]
     },
@@ -106,7 +99,6 @@
           "rubrik": "Migrationsverkets Sverigeinfo",
           "text": "Här har Migrationsverket samlat den information om Sverige som ges till kvotflyktingar innan vidarebosättning till Sverige. Bland annat i form av ett flertal kortare filmer.",
           "lank": "https://www.migrationsverket.se",
-          "farg": "f4",
           "typ": "webb"
         },
         {
@@ -114,7 +106,6 @@
           "rubrik": "The Expat Insider",
           "text": "InterNations årliga undersökning av hur expats upplever det att arbeta och leva i olika länder.",
           "lank": "https://www.internations.org/expat-insider/",
-          "farg": "f4",
           "typ": "webb"
         },
         {
@@ -123,7 +114,6 @@
           "text": "En infosida och film från Skolverket om hur lärare kan skapa bra förutsättningar för ett samtal med elever om kontroversiella frågor.",
           "lank": "https://www.skolverket.se/kompetensutveckling/stod-i-arbetet/kontroversiella-fragor#h-Stodforskolledare",
           "bild": "filer/K4P3-bild.jpg",
-          "farg": "f4",
           "typ": "webb"
         },
         {
@@ -131,7 +121,6 @@
           "rubrik": "The danger of the single story: Chimamanda Ngozi Adichie",
           "text": "Ett riktigt bra tal om fördomar.\n\nIn English (med svensk text).",
           "lank": "https://www.youtube.com/watch?v=D9Ihs241zeg",
-          "farg": "f4",
           "typ": "youtube"
         }
       ]
@@ -147,7 +136,6 @@
           "text": "Prata med föräldrar är en metodhandbok som ska ge ett stöd i att skapa tillitsfulla dialoger och möten med de föräldrar vi möter. Den är dels tänkt att fylla på läsarnas kompetens, dels att uppmana till reflektion och samtal om hur vi tänker och agerar när det gäller ämnen som kan vara svåra att prata om. Boken bidrar med handfasta tips för tillitsskapande och öppna samtal om potentiellt svåra ämnen, till exempel genom att prata utifrån bilder som är särskilt framtagna för bokens olika teman.",
           "lank": "https://goteborg.se/wps/portal/enheter/kompetenscentrum-framjande-och-forebyggande-i-sociala-fragor/material-och-metoder-for-dig-som-ar-yrkesverksam/prata-med-foraldrar",
           "bild": "filer/K5P1-bild.jpg",
-          "farg": "f2",
           "typ": "webb"
         },
         {
@@ -155,8 +143,7 @@
           "rubrik": "Mellan tradition och frihet",
           "text": "Detta är en introduktionsutbildning om hedersförtryck. Kursen vänder sig till dig som arbetar inom skola eller socialtjänst och är tänkt att fungera som en första inblick i ämnet.",
           "lank": "https://heder.goteborgsregionen.se/",
-          "bild": "filer/K5P2-bild.jpg",
-          "farg": "f2",
+          "bild": "filer/K5P2-bild-2.jpg",
           "typ": "webb"
         },
         {
@@ -164,7 +151,6 @@
           "rubrik": "Att uppmärksamma hedersrelaterat våld och förtryck",
           "text": "Frågan om hedersrelaterat våld och förtryck är mångfacetterad. Det finns i dag ett flertal kunskapsstöd för att hjälpa tjänstepersoner med detta.\n\nNationellt kunskapscentrum: här finns yrkesspecifik information samt en webbkurs att gå.",
           "lank": "https://www.hedersfortryck.se",
-          "farg": "f2",
           "typ": "webb"
         }
       ]
