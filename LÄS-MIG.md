@@ -13,7 +13,8 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 | `mall/profiler.js` | Kontaktuppgifter, välkomsttexter och sajtens adress |
 | `mall/profiler/` | Logotyper och porträtt |
 | `interkulturell-kommunikation-tandvarden/` | Exempeltavla återskapad från Padlet |
-| `netlify.toml`, `robots.txt` | Håller tavlorna borta från sökmotorer |
+| `netlify/functions/forhandsbild.mjs` | Hämtar förhandsbilder till länkar (används bara av byggaren) |
+| `netlify.toml`, `robots.txt` | Inställningar för Netlify, håller tavlorna borta från sökmotorer |
 
 ## Första gången
 
@@ -35,6 +36,20 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 
 Välj Redigera en tavla i byggaren, klistra in adressen, ändra och ladda ner.
 Dra mappen till repot som vanligt. Befintliga filer ligger kvar, `tavla.json` ersätts.
+
+## Förhandsbilder för länkar
+
+När du klistrar in en länk i byggaren hämtas en bild automatiskt, i den här ordningen:
+
+1. YouTube: videons miniatyrbild.
+2. Sidans egen delningsbild (samma bild som syns när länken delas på till exempel LinkedIn).
+3. En skärmdump av sidan via tjänsten Microlink, om sidan saknar delningsbild.
+
+Bilden sparas i tavlans mapp. Deltagarna kontaktar alltså varken YouTube eller Microlink när de öppnar tavlan.
+Microlinks gratisnivå har ett begränsat antal skärmdumpar per dag. Når du gränsen säger byggaren till, och du kan försöka nästa dag eller ladda upp en egen bild.
+Knappen "Hämta förhandsbilder för alla länkar utan bild" fyller på en hel tavla, till exempel exempeltavlan (öppna den via Redigera en tavla).
+
+Funktionen fungerar bara när sajten ligger på Netlify, inte när byggaren öppnas som fil på datorn.
 
 ## Bra att veta
 

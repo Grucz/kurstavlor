@@ -139,6 +139,13 @@ textarea.b-input { resize: vertical; line-height: 1.45; }
 .b-filinfo svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; flex: none; }
 .b-filinfo span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .b-bildrad { display: flex; align-items: center; gap: 0.75rem; }
+.b-bildknappar { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+.b-bildknappar .b-hint, .b-bildgrupp .b-hint { margin: 0; }
+.b-bildval { flex-wrap: wrap; }
+.b-hamtar { font-style: italic; }
+.b-sektion-huvud { display: flex; align-items: center; gap: 0.6rem 1rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.b-sektion-huvud h2 { margin: 0; font-size: 1.15rem; flex: 1; }
+.b-sektion-huvud .b-hint { margin: 0; width: 100%; }
 .b-bildmini { width: 120px; height: 72px; object-fit: cover; border-radius: 6px; border: 1px solid var(--b-kant); background: var(--b-bg); }
 
 /* Förhandsvisning */

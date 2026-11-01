@@ -14,6 +14,9 @@
   var MAX_FIL = 25 * 1024 * 1024;   // GitHubs gräns vid uppladdning i webbläsaren
   var VARNA_FIL = 10 * 1024 * 1024; // stora filer drar Netlify-krediter vid nedladdning
   var BILD_MAX_BREDD = 1000;
+  // Funktionen på Netlify som hämtar förhandsbilder (se netlify/functions/forhandsbild.mjs).
+  var FORHANDSBILD_API = INST.webbadress.replace(/\/$/, "") + "/api/forhandsbild";
+  var KALLNAMN = { youtube: "Bild från YouTube", delningsbild: "Sidans delningsbild", skarmdump: "Skärmdump av sidan" };
 
   var TAVLA_INDEX =
     '<!doctype html>\n<html lang="sv">\n<head>\n  <meta charset="utf-8">\n' +
@@ -175,18 +178,67 @@
         return '<label class="b-farg" title="' + fnamn[i] + '"><input type="radio" name="farg-' + p.uid + '" value="' + f + '"' + (p.farg === f ? " checked" : "") + '><span style="background:' + bg + '" aria-label="' + fnamn[i] + '"></span></label>';
       }).join("") + "</div></div>";
 
-    /* Bild */
-    h += '<div class="b-grupp"><span class="b-lbl-text">Bild (valfri)</span>';
-    if (p.bild) {
-      h += '<div class="b-bildrad"><img class="b-bildmini" src="' + esc(bildUrl(p.bild)) + '" alt="">' +
-        '<button type="button" class="b-knapp liten" data-g="ta-bort-bild">Ta bort bild</button></div>';
-    } else {
-      h += '<input type="file" class="b-input-fil" accept="image/jpeg,image/png,image/webp,image/gif" data-f="bild" aria-label="Välj bild">' +
-        (p.resurs === "lank" && KT.youtubeId(p.lank) ? '<div class="b-hint">YouTube-länk: förhandsbilden hämtas automatiskt om du inte väljer en egen.</div>' : "");
-    }
-    h += "</div></div>";
+    h += bildGruppHtml(p) + "</div>";
     return h;
   }
+
+  function harGiltigLank(p) {
+    return p.resurs === "lank" && p.lank.trim() && giltigLank(normaliseraLank(p.lank));
+  }
+
+  function bildGruppHtml(p) {
+    var h = '<div class="b-grupp b-bildgrupp"><span class="b-lbl-text">Bild (valfri)</span>';
+    var kanHamta = harGiltigLank(p);
+    if (p.bildStatus === "hamtar") {
+      h += '<p class="b-hint b-hamtar">Hämtar förhandsbild från länken...</p>';
+    } else if (p.bild) {
+      h += '<div class="b-bildrad"><img class="b-bildmini" src="' + esc(bildUrl(p.bild)) + '" alt="">' +
+        '<div class="b-bildknappar">' + (p.bild.kalla ? '<span class="b-hint">' + esc(KALLNAMN[p.bild.kalla] || "") + "</span>" : "") +
+        '<button type="button" class="b-knapp liten" data-g="ta-bort-bild">Ta bort bild</button>' +
+        (kanHamta ? '<button type="button" class="b-knapp liten" data-g="hamta-bild">Hämta ny från länken</button>' : "") +
+        "</div></div>";
+    } else {
+      h += '<div class="b-rad b-bildval"><input type="file" class="b-input-fil" accept="image/jpeg,image/png,image/webp,image/gif" data-f="bild" aria-label="Välj bild">' +
+        (kanHamta ? '<button type="button" class="b-knapp liten" data-g="hamta-bild">Hämta förhandsbild från länken</button>' : "") + "</div>";
+    }
+    if (p.bildStatus && p.bildStatus.indexOf("fel:") === 0) h += '<span class="b-varning-text">' + esc(p.bildStatus.slice(4)) + "</span>";
+    return h + "</div>";
+  }
+
+  function uppdateraBildgrupp(p) {
+    var g = document.querySelector("#post-" + p.uid + " .b-bildgrupp");
+    if (g) g.outerHTML = bildGruppHtml(p);
+  }
+
+  // Hämtar förhandsbild via funktionen och sparar den som postens bild.
+  // Svarar { ok, kvot } där kvot betyder att dagens gratisgräns är nådd.
+  function hamtaForhandsbild(p) {
+    if (!harGiltigLank(p)) return Promise.resolve({ ok: false });
+    var lank = normaliseraLank(p.lank);
+    p.bildStatus = "hamtar"; uppdateraBildgrupp(p);
+    return fetch(FORHANDSBILD_API + "?url=" + encodeURIComponent(lank))
+      .then(function (r) {
+        var typ = r.headers.get("content-type") || "";
+        if (r.ok && typ.indexOf("image/") === 0) {
+          var kalla = r.headers.get("x-kalla") || "";
+          return r.blob().then(forminskaBild).then(function (blob) {
+            if (normaliseraLank(p.lank) !== lank) return { ok: false }; // länken ändrades under tiden
+            p.bild = { ny: blob, namn: "bild.jpg", url: URL.createObjectURL(blob), auto: true, kalla: kalla };
+            p.bildStatus = ""; smutsig = true;
+            return { ok: true };
+          });
+        }
+        return r.json().catch(function () { return {}; }).then(function (j) {
+          p.bildStatus = "fel:" + (j.fel || "Ingen förhandsbild hittades.");
+          return { ok: false, kvot: r.status === 429 };
+        });
+      }, function () {
+        p.bildStatus = "fel:Kunde inte nå bildtjänsten. Den fungerar först när sajten ligger på Netlify.";
+        return { ok: false, natverk: true };
+      })
+      .then(function (res) { uppdateraBildgrupp(p); return res; });
+  }
+
 
   function lankTips(u) {
     u = String(u || "").trim();
@@ -242,7 +294,9 @@
       (p.kontakt ? " (" + esc(p.kontakt.epost) + ")" : " (finns inte i den neutrala profilen)") + "</label></section>";
 
     /* Kategorier */
-    h += '<section class="b-sektion"><h2>Kategorier</h2>';
+    h += '<section class="b-sektion"><div class="b-sektion-huvud"><h2>Kategorier</h2>' +
+      '<button type="button" class="b-knapp liten" data-g="hamta-alla">Hämta förhandsbilder för alla länkar utan bild</button>' +
+      '<span class="b-hint" id="b-alla-status" role="status"></span></div>';
     state.kategorier.forEach(function (k, ki) {
       h += '<details class="b-kategori" data-k="' + ki + '" id="kat-' + k.uid + '"' + (k.oppen ? " open" : "") + ">" +
         '<summary><span class="b-etikett">K' + (ki + 1) + "</span><span class=\"b-kat-namn\">" + esc(k.rubrik || "Kategori utan rubrik") + '</span><span class="b-kat-antal">' + k.poster.length + " poster</span></summary>" +
@@ -320,7 +374,11 @@
       if (tf === "slug") { state.slug = saniter(t.value); t.value = state.slug; return; }
       if (t.getAttribute("data-f") === "lank") {
         var pl = postFran(e); pl.post.lank = normaliseraLank(t.value); t.value = pl.post.lank;
-        ritaRedigering("#post-" + pl.post.uid + ' [data-f="lank"]'); return;
+        if (pl.post.bild && pl.post.bild.auto) pl.post.bild = null; // ny länk, ny automatisk bild
+        pl.post.bildStatus = "";
+        ritaRedigering("#post-" + pl.post.uid + ' [data-f="lank"]');
+        if (!pl.post.bild) hamtaForhandsbild(pl.post);
+        return;
       }
       if (t.name && t.name.indexOf("farg-") === 0) {
         var pc = postFran(e); pc.post.farg = t.value;
@@ -374,6 +432,7 @@
         var nk = nyKategori(); state.kategorier.push(nk);
         ritaRedigering("#kat-" + nk.uid + ' [data-kf="rubrik"]'); return;
       }
+      if (g === "hamta-alla") { hamtaAllaForhandsbilder(b); return; }
       if (g === "inget-slutdatum") { state.slutdatum = ""; ritaRedigering(); return; }
       if (g === "aterstall-valkomst") { state.valkomstText = PROFILER[state.profil].valkomst; ritaRedigering(); return; }
 
@@ -408,8 +467,36 @@
         lista.splice(p.pi, 1); ritaRedigering(); return;
       }
       if (g === "ta-bort-fil") { p.post.fil = null; ritaRedigering(); return; }
-      if (g === "ta-bort-bild") { p.post.bild = null; ritaRedigering(); return; }
+      if (g === "ta-bort-bild") { p.post.bild = null; p.post.bildStatus = ""; uppdateraBildgrupp(p.post); return; }
+      if (g === "hamta-bild") { hamtaForhandsbild(p.post); return; }
     });
+  }
+
+  // Går igenom alla länkposter utan bild, en i taget.
+  function hamtaAllaForhandsbilder(knapp) {
+    var lista = [];
+    state.kategorier.forEach(function (k) { k.poster.forEach(function (p) { if (!p.bild && harGiltigLank(p)) lista.push(p); }); });
+    var status = $("#b-alla-status");
+    if (!lista.length) { status.textContent = "Alla länkar har redan en bild."; return; }
+    knapp.disabled = true;
+    var i = 0, klara = 0;
+    (function nasta() {
+      if (i >= lista.length) {
+        knapp.disabled = false;
+        status.textContent = "Klart: " + klara + " av " + lista.length + " länkar fick bild.";
+        return;
+      }
+      status.textContent = "Hämtar " + (i + 1) + " av " + lista.length + "...";
+      hamtaForhandsbild(lista[i++]).then(function (res) {
+        if (res.ok) klara++;
+        if (res.kvot || res.natverk) {
+          knapp.disabled = false;
+          status.textContent = (res.kvot ? "Dagens gräns för skärmdumpar är nådd. " : "Bildtjänsten gick inte att nå. ") + klara + " länkar fick bild.";
+          return;
+        }
+        nasta();
+      });
+    })();
   }
 
   /* ---------- Bygga tavla.json ---------- */

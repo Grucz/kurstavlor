@@ -2,6 +2,17 @@
 [build]
   publish = "."
 
+# Funktionen som hämtar förhandsbilder till byggaren.
+[functions]
+  directory = "netlify/functions"
+
+# Funktionens källkod ska inte gå att läsa som vanlig fil.
+[[redirects]]
+  from = "/netlify/*"
+  to = "/"
+  status = 404
+  force = true
+
 # Håll tavlorna borta från sökmotorer.
 # Tillåt byggaren att hämta tidigare tavlor även när den körs lokalt.
 [[headers]]
