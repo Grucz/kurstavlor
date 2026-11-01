@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tavelbyggare | Kurstavlor</title>
+  <link rel="stylesheet" href="../mall/tavla.css">
+  <link rel="stylesheet" href="bygg.css">
+</head>
+<body class="byggare">
+
+  <header class="b-topp">
+    <div class="b-topp-namn">Tavelbyggare</div>
+    <nav class="b-flikar" id="b-flikar" hidden>
+      <button type="button" class="b-flik aktiv" data-flik="redigera">Redigera</button>
+      <button type="button" class="b-flik" data-flik="forhandsvisa">Förhandsvisa</button>
+    </nav>
+    <div class="b-topp-hoger" id="b-topp-hoger" hidden>
+      <span class="b-lage" id="b-lage"></span>
+      <button type="button" class="b-knapp" id="b-borja-om">Börja om</button>
+      <button type="button" class="b-knapp primar" id="b-ladda-ner">Ladda ner tavlan</button>
+    </div>
+  </header>
+
+  <!-- Startval -->
+  <main class="b-start" id="b-start">
+    <h1>Vad vill du göra?</h1>
+    <div class="b-startval">
+      <section class="b-kort">
+        <h2>Ny tavla</h2>
+        <p>Börja från en tom tavla.</p>
+        <button type="button" class="b-knapp primar" data-start="ny">Skapa ny tavla</button>
+      </section>
+
+      <section class="b-kort">
+        <h2>Tidigare tavla som mall</h2>
+        <p>Ger en ny tavla med ny adress. Kategorier, texter, länkar och bilder följer med. Dokument (till exempel presentationen) följer inte med, där väljer du nya filer.</p>
+        <div class="b-hamta" data-lage="mall"></div>
+      </section>
+
+      <section class="b-kort">
+        <h2>Redigera en tavla</h2>
+        <p>Rätta eller komplettera en publicerad tavla. Adressen och alla filer behålls.</p>
+        <div class="b-hamta" data-lage="redigera"></div>
+      </section>
+    </div>
+    <p class="b-start-fel" id="b-start-fel" role="alert"></p>
+  </main>
+
+  <!-- Redigering -->
+  <main class="b-redigera" id="b-redigera" hidden></main>
+
+  <!-- Förhandsvisning -->
+  <div class="b-forhand" id="b-forhand" hidden>
+    <div id="b-forhand-tavla"></div>
+  </div>
+
+  <template id="b-hamta-mall">
+    <label class="b-lbl">Klistra in tavlans adress
+      <span class="b-rad">
+        <input type="text" class="b-input" data-adress placeholder="https://kurstavlor.netlify.app/kursnamn-2026-11/">
+        <button type="button" class="b-knapp" data-hamta-adress>Hämta</button>
+      </span>
+    </label>
+    <p class="b-eller">eller</p>
+    <label class="b-knapp b-filknapp">Välj tavlans mapp på datorn
+      <input type="file" data-hamta-mapp webkitdirectory directory multiple hidden>
+    </label>
+  </template>
+
+  <script src="../mall/profiler.js"></script>
+  <script src="../mall/bibliotek/qrcode.min.js"></script>
+  <script src="../mall/bibliotek/jszip.min.js"></script>
+  <script src="../mall/tavla.js"></script>
+  <script src="bygg.js"></script>
+</body>
+</html>

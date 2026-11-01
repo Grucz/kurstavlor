@@ -1,0 +1,11 @@
+# Kurstavlor: ingen byggprocess, sajten publiceras som den är.
+[build]
+  publish = "."
+
+# Håll tavlorna borta från sökmotorer.
+# Tillåt byggaren att hämta tidigare tavlor även när den körs lokalt.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Access-Control-Allow-Origin = "*"
