@@ -26,6 +26,8 @@
   --farg2: #f7549b;
   --farg3: #3ad342;
   --farg4: #0098fa;
+  --farg0-pa: #000; --farg1-pa: #000; --farg2-pa: #000; --farg3-pa: #000; --farg4-pa: #000;
+  --mork: #000; --mork-pa: #f6ecdc;
 }
 
 /* GR: Arial. Färgerna är provisoriska tills GR:s profilfärger finns. */
@@ -45,10 +47,12 @@
   --accent-pa: #fff;
   --accent-ljus: #e3eef7;
   --farg0: #00548f;
-  --farg1: #2b8cc4;
+  --farg1: #1f6fa3;
   --farg2: #00857c;
   --farg3: #6a5aa8;
   --farg4: #4d5b6a;
+  --farg0-pa: #fff; --farg1-pa: #fff; --farg2-pa: #fff; --farg3-pa: #fff; --farg4-pa: #fff;
+  --mork: #1b2a3a; --mork-pa: #fff;
 }
 
 /* Neutral: lugn och ljus, inspirerad av Valet. Justeras när skärmdump finns. */
@@ -72,6 +76,8 @@
   --farg2: #e0767a;
   --farg3: #e2a63b;
   --farg4: #8a8fa8;
+  --farg0-pa: #fff; --farg1-pa: #000; --farg2-pa: #000; --farg3-pa: #000; --farg4-pa: #000;
+  --mork: #24264a; --mork-pa: #fff;
 }
 
 /* ---------- Grund ---------- */
@@ -213,7 +219,12 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 }
 .post-play .ikon { width: 54px; height: 54px; filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.6)); stroke-width: 1.4; }
 
-.post-portratt { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.post-portratt { position: relative; margin: 0; }
+.post-portratt img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 30%; }
+.post-portratt figcaption {
+  position: absolute; right: 0.5rem; bottom: 0.4rem;
+  font-size: 0.7rem; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
 
 .post-typ {
   display: flex; align-items: center; gap: 0.4rem;
@@ -234,13 +245,20 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   mask-image: linear-gradient(#000 65%, transparent);
 }
 .fall-ut {
+  display: flex; align-items: center; gap: 0.4rem;
   font: inherit; font-size: 0.88rem; font-weight: 700;
-  background: none; border: 0; padding: 0.3rem 0; margin-top: 0.15rem;
+  background: none; border: 0; padding: 0.35rem 0; margin-top: 0.2rem;
   color: var(--lank); cursor: pointer;
 }
+.fall-ut::after {
+  content: ""; width: 0.45em; height: 0.45em;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+}
+.posttext.utfalld + .fall-ut::after { transform: rotate(-135deg) translateY(-1px); }
 
 .post-knapp {
-  display: inline-flex; align-items: center; gap: 0.35rem;
+  display: flex; width: fit-content; align-items: center; gap: 0.35rem;
   margin-top: 0.7rem;
   font-size: 0.9rem; font-weight: 700;
   text-decoration: none;
@@ -254,6 +272,19 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   background: var(--accent); color: var(--accent-pa);
   padding: 0.5rem 0.9rem; border-radius: 999px;
 }
+
+/* Rutor med bakgrundsfärg */
+.post[data-farg="f0"] { --pf-bg: var(--farg0); --pf-text: var(--farg0-pa); }
+.post[data-farg="f1"] { --pf-bg: var(--farg1); --pf-text: var(--farg1-pa); }
+.post[data-farg="f2"] { --pf-bg: var(--farg2); --pf-text: var(--farg2-pa); }
+.post[data-farg="f3"] { --pf-bg: var(--farg3); --pf-text: var(--farg3-pa); }
+.post[data-farg="f4"] { --pf-bg: var(--farg4); --pf-text: var(--farg4-pa); }
+.post[data-farg="mork"] { --pf-bg: var(--mork); --pf-text: var(--mork-pa); }
+.post[data-farg] { background: var(--pf-bg); color: var(--pf-text); border-color: transparent; --lank: var(--pf-text); }
+.post[data-farg] .post-typ { color: inherit; opacity: 0.8; }
+.post[data-farg] .post-knapp, .post[data-farg] .fall-ut { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.post[data-farg].framhavd { border-color: var(--pf-text); }
+.post[data-farg].framhavd .post-knapp { background: var(--pf-text); color: var(--pf-bg); text-decoration: none; }
 
 .post-kontakt p { margin: 0; font-size: 0.95rem; }
 .kontakt-logga { display: block; max-width: 180px; height: auto; margin-bottom: 0.75rem; }
@@ -335,6 +366,7 @@ button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
   .kolumn-rubrik button { box-shadow: none; padding: 0 0 2pt; border-top: 0; border-bottom: 2px solid #000; border-radius: 0; }
   .kolumn-rubrik button::after, .kolumn-antal { display: none !important; }
   .post { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 6pt; }
+  .post[data-farg] { background: #fff !important; color: #000 !important; border-left: 6px solid var(--pf-bg); }
   .post.framhavd { border: 2px solid #000; }
   .post-bild, .post-portratt { display: none; }
   .post-kropp { padding: 6pt 8pt; }

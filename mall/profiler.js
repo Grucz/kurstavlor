@@ -11,7 +11,8 @@ window.KURSTAVLA_INSTALLNINGAR = {
 
   // Porträttet i Välkommen-kolumnen (samma för alla profiler).
   // Lägg bilden i mall/profiler/ med exakt detta namn.
-  portratt: "/mall/profiler/portratt.jpg"
+  portratt: "/mall/profiler/portratt.jpg",
+  portrattFoto: "Foto: Frozentime"
 };
 
 window.KURSTAVLA_PROFILER = {
@@ -22,7 +23,7 @@ window.KURSTAVLA_PROFILER = {
       namn: "Patrick Gruczkun",
       organisation: "Samarbetsbolaget",
       epost: "patrick@samarbetsbolaget.se",
-      telefon: "0734-65 87 41",
+      telefon: "0736-858741",
       webb: "https://www.samarbetsbolaget.se",
       linkedin: ""
     },

@@ -123,6 +123,18 @@ textarea.b-input { resize: vertical; line-height: 1.45; }
 .b-post-huvud { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.65rem; }
 .b-post-huvud .b-check { margin: 0 0 0 0.4rem; }
 .b-select { font: inherit; font-size: 0.85rem; padding: 0.3rem 0.4rem; border: 1px solid var(--b-kant); border-radius: 8px; background: #fff; max-width: 190px; }
+.b-farger { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+.b-farg input { position: absolute; opacity: 0; }
+.b-farg span { display: block; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--b-kant); cursor: pointer; box-shadow: inset 0 0 0 3px #fff; }
+.b-farg input:checked + span { outline: 3px solid var(--b-text); outline-offset: 2px; }
+.b-farg input:focus-visible + span { outline: 3px solid #2b6cd4; outline-offset: 2px; }
+.b-post[data-farg] { border-left-width: 8px; }
+.b-post[data-farg="f0"] { border-left-color: var(--farg0); }
+.b-post[data-farg="f1"] { border-left-color: var(--farg1); }
+.b-post[data-farg="f2"] { border-left-color: var(--farg2); }
+.b-post[data-farg="f3"] { border-left-color: var(--farg3); }
+.b-post[data-farg="f4"] { border-left-color: var(--farg4); }
+.b-post[data-farg="mork"] { border-left-color: var(--mork); }
 .b-filinfo { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.9rem; padding: 0.5rem 0.65rem; background: var(--b-bg); border-radius: 8px; }
 .b-filinfo svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; flex: none; }
 .b-filinfo span { flex: 1; min-width: 0; overflow-wrap: anywhere; }

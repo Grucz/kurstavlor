@@ -85,6 +85,9 @@
     return '<svg class="ikon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (IKON[namn] || IKON.dokument) + "</svg>";
   }
 
+  // Tillåtna bakgrundsfärger på rutor (färgerna styrs av profilen i tavla.css).
+  var FARGER = ["f0", "f1", "f2", "f3", "f4", "mork"];
+
   /* ---------- Typ av resurs ---------- */
 
   function youtubeId(url) {
@@ -314,7 +317,8 @@
     /* Välkommen */
     if (fasta.valkommen !== false) {
       var vk = kolumn("Välkommen hit", "kolumn-fast", true);
-      var portratt = INST.portratt ? '<img class="post-portratt" src="' + esc(INST.portratt) + '" alt="Patrick Gruczkun" onerror="this.remove()">' : "";
+      var portratt = INST.portratt ? '<figure class="post-portratt"><img src="' + esc(INST.portratt) + '" alt="Patrick Gruczkun" onerror="this.parentNode.remove()">' +
+        (INST.portrattFoto ? "<figcaption>" + esc(INST.portrattFoto) + "</figcaption>" : "") + "</figure>" : "";
       vk.appendChild(el("article", { class: "post" }, portratt + '<div class="post-kropp">' + textBlock(textTillHtml(data.valkomstText || profil.valkomst), true) + "</div>"));
     }
 
@@ -357,7 +361,8 @@
         if (post.text) h += textBlock(textTillHtml(post.text));
         if (href && typ) h += '<a class="post-knapp"' + lankAttr + utskrift + ">" + esc(typ.knapp) + ikon("pil") + "</a>";
         h += "</div>";
-        inne.appendChild(el("article", { class: "post" + (post.framhavd ? " framhavd" : "") }, h));
+        var farg = FARGER.indexOf(post.farg) >= 0 ? post.farg : null;
+        inne.appendChild(el("article", { class: "post" + (post.framhavd ? " framhavd" : ""), "data-farg": farg }, h));
       });
     });
 
@@ -406,6 +411,7 @@
     laddaNer: laddaNer,
     kopiera: kopiera,
     textTillHtml: textTillHtml,
-    esc: esc
+    esc: esc,
+    FARGER: FARGER
   };
 })();

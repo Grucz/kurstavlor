@@ -27,6 +27,13 @@
   var IKON_NER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>';
   var IKON_FIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2.5h8l4 4V21.5H6z"/><path d="M14 2.5v4h4"/></svg>';
 
+  // Namn på profilens färger, i samma ordning som f0 till f4 och mörk i tavla.css.
+  var FARGNAMN = {
+    sb: ["Korall", "Gul", "Rosa", "Grön", "Blå", "Svart"],
+    gr: ["Mörkblå", "Blå", "Grönblå", "Lila", "Grå", "Mörk"],
+    neutral: ["Lila", "Turkos", "Korall", "Gul", "Grå", "Mörk"]
+  };
+
   var state = null;
   var smutsig = false;
   var aktivFlik = "redigera";
@@ -82,7 +89,7 @@
   /* ---------- Tillstånd ---------- */
 
   function nyPost() {
-    return { uid: uid("p-"), id: null, rubrik: "", text: "", resurs: "ingen", lank: "", fil: null, filSaknas: false, tidigareFil: "", bild: null, framhavd: false };
+    return { uid: uid("p-"), id: null, rubrik: "", text: "", resurs: "ingen", lank: "", fil: null, filSaknas: false, tidigareFil: "", bild: null, framhavd: false, farg: "" };
   }
   function nyKategori() {
     return { uid: uid("k-"), id: null, rubrik: "", text: "", oppen: true, poster: [nyPost()] };
@@ -127,7 +134,7 @@
     var flytta = '<select class="b-select" data-g="flytta" aria-label="Flytta posten till annan kategori"><option value="">Flytta till kategori</option>' +
       state.kategorier.map(function (k, i) { return i === ki ? "" : '<option value="' + i + '">' + esc((i + 1) + ". " + (k.rubrik || "Kategori utan rubrik")) + "</option>"; }).join("") + "</select>";
 
-    var h = '<div class="b-post' + (p.framhavd ? " framhavd" : "") + '" data-k="' + ki + '" data-p="' + pi + '" id="post-' + p.uid + '">' +
+    var h = '<div class="b-post' + (p.framhavd ? " framhavd" : "") + '"' + (p.farg ? ' data-farg="' + p.farg + '"' : "") + ' data-k="' + ki + '" data-p="' + pi + '" id="post-' + p.uid + '">' +
       '<div class="b-post-huvud"><span class="b-etikett">' + etikett + "</span>" +
       '<label class="b-check"><input type="checkbox" data-f="framhavd"' + (p.framhavd ? " checked" : "") + "> Framhävd</label>" +
       '<span class="b-spacer"></span>' +
@@ -158,6 +165,15 @@
       }
     }
     h += "</div>";
+
+    /* Bakgrundsfärg */
+    var fnamn = FARGNAMN[state.profil] || FARGNAMN.sb;
+    h += '<div class="b-grupp"><span class="b-lbl-text">Bakgrundsfärg</span><div class="b-farger">' +
+      '<label class="b-farg" title="Vit"><input type="radio" name="farg-' + p.uid + '" value=""' + (!p.farg ? " checked" : "") + '><span style="background:#fff" aria-label="Vit"></span></label>' +
+      KT.FARGER.map(function (f, i) {
+        var bg = f === "mork" ? "var(--mork)" : "var(--farg" + f.slice(1) + ")";
+        return '<label class="b-farg" title="' + fnamn[i] + '"><input type="radio" name="farg-' + p.uid + '" value="' + f + '"' + (p.farg === f ? " checked" : "") + '><span style="background:' + bg + '" aria-label="' + fnamn[i] + '"></span></label>';
+      }).join("") + "</div></div>";
 
     /* Bild */
     h += '<div class="b-grupp"><span class="b-lbl-text">Bild (valfri)</span>';
@@ -190,6 +206,7 @@
 
   function ritaRedigering(fokus) {
     var r = $("#b-redigera");
+    document.documentElement.setAttribute("data-profil", state.profil);
     var p = PROFILER[state.profil];
     var adressPrefix = INST.webbadress.replace(/\/$/, "") + "/";
     var h = "";
@@ -304,6 +321,11 @@
       if (t.getAttribute("data-f") === "lank") {
         var pl = postFran(e); pl.post.lank = normaliseraLank(t.value); t.value = pl.post.lank;
         ritaRedigering("#post-" + pl.post.uid + ' [data-f="lank"]'); return;
+      }
+      if (t.name && t.name.indexOf("farg-") === 0) {
+        var pc = postFran(e); pc.post.farg = t.value;
+        if (t.value) pc.el.setAttribute("data-farg", t.value); else pc.el.removeAttribute("data-farg");
+        return;
       }
       if (t.name && t.name.indexOf("resurs-") === 0) {
         var pr = postFran(e); pr.post.resurs = t.value; ritaRedigering("#post-" + pr.post.uid + ' input[value="' + t.value + '"]'); return;
@@ -433,6 +455,7 @@
           }
         }
         if (p.framhavd) pj.framhavd = true;
+        if (p.farg) pj.farg = p.farg;
         var t = KT.typFor(pj); if (t) pj.typ = t.typ;
         kj.poster.push(pj);
       });
@@ -628,6 +651,7 @@
       (kat.poster || []).forEach(function (post) {
         var p = nyPost();
         p.id = post.id || null; p.rubrik = post.rubrik || ""; p.text = post.text || ""; p.framhavd = !!post.framhavd;
+        p.farg = KT.FARGER.indexOf(post.farg) >= 0 ? post.farg : "";
         if (post.lank) { p.resurs = "lank"; p.lank = post.lank; }
         if (post.fil) {
           p.resurs = "fil";
