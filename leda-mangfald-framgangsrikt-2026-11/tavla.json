@@ -95,13 +95,6 @@
       "text": "",
       "poster": [
         {
-          "id": "p-migr01",
-          "rubrik": "Migrationsverkets Sverigeinfo",
-          "text": "Här har Migrationsverket samlat den information om Sverige som ges till kvotflyktingar innan vidarebosättning till Sverige. Bland annat i form av ett flertal kortare filmer.",
-          "lank": "https://www.migrationsverket.se",
-          "typ": "webb"
-        },
-        {
           "id": "p-expa01",
           "rubrik": "The Expat Insider",
           "text": "InterNations årliga undersökning av hur expats upplever det att arbeta och leva i olika länder.",
@@ -119,9 +112,10 @@
         {
           "id": "p-sing01",
           "rubrik": "The danger of the single story: Chimamanda Ngozi Adichie",
-          "text": "Ett riktigt bra tal om fördomar.\n\nIn English (med svensk text).",
-          "lank": "https://www.youtube.com/watch?v=D9Ihs241zeg",
-          "typ": "youtube"
+          "text": "Ett riktigt bra tal om fördomar.\n\nIn English (finns med svensk textning).",
+          "lank": "https://www.ted.com/talks/chimamanda_ngozi_adichie_the_danger_of_a_single_story?utm_campaign=tedspread&utm_medium=referral&utm_source=tedcomshare",
+          "bild": "filer/K4P3-bild-2.jpg",
+          "typ": "webb"
         }
       ]
     },
