@@ -164,7 +164,8 @@
           '<button type="button" class="b-knapp liten" data-g="ta-bort-fil">Byt eller ta bort</button></div>' + stor;
       } else {
         if (p.filSaknas) h += '<p class="b-varning-text">Dokumentet ' + (p.tidigareFil ? "(" + esc(p.tidigareFil) + ") " : "") + "följde inte med från mallen. Välj en ny fil, byt till länk eller ta bort posten.</p>";
-        h += '<input type="file" class="b-input-fil" data-f="fil" aria-label="Välj fil">';
+        h += '<label class="b-knapp liten b-filval">Välj dokument (PDF, Word, PowerPoint m.fl.)<input type="file" class="b-dold" data-f="fil"></label>' +
+          '<div class="b-hint">Högst 25 MB. Större filer läggs i Dropbox och länkas.</div>';
       }
     }
     h += "</div>";
@@ -198,7 +199,7 @@
         (kanHamta ? '<button type="button" class="b-knapp liten" data-g="hamta-bild">Hämta ny från länken</button>' : "") +
         "</div></div>";
     } else {
-      h += '<div class="b-rad b-bildval"><input type="file" class="b-input-fil" accept="image/jpeg,image/png,image/webp,image/gif" data-f="bild" aria-label="Välj bild">' +
+      h += '<div class="b-rad b-bildval"><label class="b-knapp liten b-filval">Välj egen bild (JPG, PNG)<input type="file" class="b-dold" accept="image/jpeg,image/png,image/webp,image/gif" data-f="bild"></label>' +
         (kanHamta ? '<button type="button" class="b-knapp liten" data-g="hamta-bild">Hämta förhandsbild från länken</button>' : "") + "</div>";
     }
     if (p.bildStatus && p.bildStatus.indexOf("fel:") === 0) h += '<span class="b-varning-text">' + esc(p.bildStatus.slice(4)) + "</span>";

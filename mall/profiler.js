@@ -36,8 +36,7 @@ window.KURSTAVLA_PROFILER = {
 
   gr: {
     namn: "Göteborgsregionen",
-    // Lägg GR:s logga som mall/profiler/gr/logga.png. Saknas den visas namnet i text.
-    logga: "/mall/profiler/gr/logga.png",
+    logga: "/mall/profiler/gr/logga.svg",
     kontakt: {
       namn: "Patrick Gruczkun",
       organisation: "Göteborgsregionen",

@@ -59,7 +59,7 @@ body.byggare.visar-forhand { background: var(--sida-monster), var(--sida-bg); }
 .b-kort h2 { margin: 0 0 0.4rem; font-size: 1.2rem; }
 .b-kort p { color: var(--b-svag); margin: 0 0 1rem; font-size: 0.95rem; }
 .b-eller { text-align: center; margin: 0.6rem 0 !important; font-size: 0.85rem; }
-.b-filknapp { justify-content: center; width: 100%; }
+.b-filknapp { justify-content: center; width: 100%; position: relative; cursor: pointer; }
 .b-start-fel { color: var(--b-fara); font-weight: 600; margin-top: 1rem; }
 
 /* Redigering */
@@ -78,6 +78,9 @@ body.byggare.visar-forhand { background: var(--sida-monster), var(--sida-bg); }
 textarea.b-input { resize: vertical; line-height: 1.45; }
 .b-input[readonly] { background: var(--b-bg); color: var(--b-svag); }
 .b-datum { width: auto; margin-top: 0; }
+.b-dold { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); }
+.b-filval { position: relative; cursor: pointer; }
+.b-filval:focus-within { outline: 3px solid #2b6cd4; outline-offset: 1px; }
 .b-input-fil { display: block; font: inherit; font-size: 0.9rem; margin-top: 0.2rem; }
 .b-rad { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.3rem; }
 .b-rad .b-input { margin-top: 0; }

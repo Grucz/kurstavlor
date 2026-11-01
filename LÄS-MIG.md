@@ -22,8 +22,7 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 2. Ladda upp allt innehåll i den här mappen till repot (Add file, Upload files).
 3. Skapa en ny sajt på Netlify från repot. Byt sajtens namn till `kurstavlor` under Site configuration.
    Om namnet är upptaget: välj ett annat och ändra `webbadress` i `mall/profiler.js`.
-4. Lägg porträttet som `mall/profiler/portratt.jpg` (liggande format, cirka 800 pixlar brett).
-5. Lägg GR:s logga som `mall/profiler/gr/logga.png` om du vill ha den. Annars visas namnet i text.
+4. Porträtt och logotyper ligger redan på plats i `mall/profiler/`. Byt fil med samma namn om du vill ändra något.
 
 ## Ny tavla
 
