@@ -62,6 +62,22 @@ body.byggare.visar-forhand { background: var(--sida-monster), var(--sida-bg); }
 .b-filknapp { justify-content: center; width: 100%; position: relative; cursor: pointer; }
 .b-start-fel { color: var(--b-fara); font-weight: 600; margin-top: 1rem; }
 
+/* Lista över publicerade tavlor */
+.b-lista { margin-top: 1.5rem; }
+.b-lista .b-sektion-huvud h2 { font-size: 1.2rem; }
+.b-lista-sok { width: min(320px, 100%); margin-top: 0; }
+.b-listgrupp { margin-top: 1rem; }
+.b-listgrupp h3 { font-size: 1rem; margin: 0 0 0.4rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--b-kant); }
+.b-listgrupp ul { list-style: none; margin: 0; padding: 0; }
+.b-listrad { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.7rem 0; border-bottom: 1px solid #ecebe6; }
+.b-listtext { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.b-listrubrik { font-weight: 700; color: var(--b-text); }
+.b-listunder { font-size: 0.92rem; }
+.b-listmeta { font-size: 0.8rem; color: var(--b-svag); overflow-wrap: anywhere; }
+.b-listknappar { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.b-arkivmarkering { display: inline-block; margin-left: 0.3rem; padding: 0 0.45rem; border-radius: 999px; background: #eee; color: var(--b-svag); font-weight: 600; }
+.b-kort p.b-hint { margin: 0.5rem 0 0; }
+
 /* Redigering */
 .b-redigera { max-width: 860px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
 .b-sektion { background: var(--b-yta); border: 1px solid var(--b-kant); border-radius: 12px; padding: 1.1rem 1.25rem 1.25rem; margin-bottom: 1.25rem; }

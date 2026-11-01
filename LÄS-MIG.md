@@ -13,6 +13,7 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 | `mall/profiler.js` | Kontaktuppgifter, välkomsttexter och sajtens adress |
 | `mall/profiler/` | Logotyper och porträtt |
 | `interkulturell-kommunikation-tandvarden/` | Exempeltavla återskapad från Padlet |
+| `verktyg/lista-tavlor.mjs` | Skapar `tavlor.json` (listan över tavlor i byggaren) vid varje publicering |
 | `netlify/functions/forhandsbild.mjs` | Hämtar förhandsbilder till länkar (används bara av byggaren) |
 | `netlify.toml`, `robots.txt` | Inställningar för Netlify, håller tavlorna borta från sökmotorer |
 
@@ -33,7 +34,7 @@ Allt är statiska filer på GitHub och Netlify, ingen databas.
 
 ## Rätta en publicerad tavla
 
-Välj Redigera en tavla i byggaren, klistra in adressen, ändra och ladda ner.
+Hitta tavlan under Publicerade tavlor i byggaren och klicka Redigera (eller Använd som mall för en ny tavla). Ändra och ladda ner.
 Dra mappen till repot som vanligt. Befintliga filer ligger kvar, `tavla.json` ersätts.
 
 ## Förhandsbilder för länkar
@@ -51,6 +52,8 @@ Knappen "Hämta förhandsbilder för alla länkar utan bild" fyller på en hel t
 Funktionen fungerar bara när sajten ligger på Netlify, inte när byggaren öppnas som fil på datorn.
 
 ## Bra att veta
+
+- Listan över tavlor uppdateras automatiskt när Netlify publicerar. Tar du bort en tavelmapp försvinner den ur listan.
 
 - Filer större än 25 MB går inte att ladda upp via GitHub i webbläsaren. Lägg dem i Dropbox och använd länk.
 - Netlifys gratisplan har en gemensam kreditpott för alla sajter. En uppladdning kostar en publicering, och stora PDF:er som laddas ner många gånger drar trafik.

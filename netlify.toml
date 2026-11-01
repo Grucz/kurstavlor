@@ -1,6 +1,8 @@
-# Kurstavlor: ingen byggprocess, sajten publiceras som den är.
+# Kurstavlor: sajten publiceras som den är. Vid varje publicering skapas
+# tavlor.json (förteckningen över alla tavlor som byggaren visar).
 [build]
   publish = "."
+  command = "node verktyg/lista-tavlor.mjs"
 
 # Funktionen som hämtar förhandsbilder till byggaren.
 [functions]
@@ -9,6 +11,12 @@
 # Funktionens källkod ska inte gå att läsa som vanlig fil.
 [[redirects]]
   from = "/netlify/*"
+  to = "/"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/verktyg/*"
   to = "/"
   status = 404
   force = true

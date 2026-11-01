@@ -46,6 +46,11 @@
   function $(s, r) { return (r || document).querySelector(s); }
   function uid(prefix) { return prefix + Math.random().toString(36).slice(2, 8); }
 
+  function idagStr() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
   function manad() {
     var d = new Date();
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
@@ -99,7 +104,7 @@
   }
   function nyttState() {
     return {
-      lage: "ny", bas: "", filkarta: {}, befintligaFiler: {},
+      lage: "ny", bas: "", filkarta: {}, befintligaFiler: {}, skapad: "",
       profil: "sb", rubrik: "", underrubrik: "", slug: "", slugManuell: false, slutdatum: "",
       valkommen: true, kontakt: true, valkomstText: PROFILER.sb.valkomst,
       kategorier: [nyKategori()]
@@ -512,6 +517,7 @@
       underrubrik: state.underrubrik.trim(),
       profil: state.profil,
       slutdatum: state.slutdatum || "",
+      skapad: state.skapad || idagStr(),
       fastaKolumner: { valkommen: !!state.valkommen, kontakt: !!(state.kontakt && profil.kontakt) },
       valkomstText: state.valkomstText.trim() === profil.valkomst.trim() ? "" : state.valkomstText.trim(),
       kategorier: []
@@ -724,7 +730,7 @@
     s.kontakt = fk.kontakt !== false;
     s.valkomstText = json.valkomstText || PROFILER[s.profil].valkomst;
     if (lage === "redigera") {
-      s.slug = kalla.slug; s.slugManuell = true; s.slutdatum = json.slutdatum || "";
+      s.slug = kalla.slug; s.slugManuell = true; s.slutdatum = json.slutdatum || ""; s.skapad = json.skapad || "";
       s.bas = kalla.bas || "";
       if (kalla.karta) Object.keys(kalla.karta).forEach(function (k) { s.filkarta[k] = URL.createObjectURL(kalla.karta[k]); });
     } else {
@@ -773,6 +779,80 @@
     });
   }
 
+  /* ---------- Lista över befintliga tavlor ---------- */
+
+  var PROFILORDNING = [["sb", "Samarbetsbolaget"], ["gr", "Göteborgsregionen"], ["neutral", "Neutral"]];
+  var MANADER = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
+  var allaTavlor = [];
+
+  // Datum att sortera och visa: skapad-datum, annars månaden i adressen.
+  function tavlansDatum(t) {
+    if (t.skapad) return t.skapad;
+    var m = t.slug.match(/(\d{4})-(\d{2})(?:-\d+)?$/);
+    return m ? m[1] + "-" + m[2] : "";
+  }
+  function visaDatum(d) {
+    var m = d.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/);
+    if (!m) return "";
+    return (m[3] ? +m[3] + " " : "") + MANADER[+m[2] - 1] + " " + m[1];
+  }
+
+  function ritaTavellista() {
+    var r = $("#b-lista-innehall");
+    var sok = saniter($("#b-lista-sok").value).replace(/-/g, " ").trim();
+    var traffar = allaTavlor.filter(function (t) {
+      if (!sok) return true;
+      return saniter(t.rubrik + " " + t.underrubrik + " " + t.slug).replace(/-/g, " ").indexOf(sok) >= 0;
+    });
+    var idag = idagStr();
+    var h = "";
+    PROFILORDNING.forEach(function (pr) {
+      var lista = traffar.filter(function (t) { return (PROFILER[t.profil] ? t.profil : "sb") === pr[0]; })
+        .sort(function (a, b) { return tavlansDatum(b).localeCompare(tavlansDatum(a)) || a.rubrik.localeCompare(b.rubrik, "sv"); });
+      if (!lista.length) return;
+      h += '<section class="b-listgrupp"><h3>' + pr[1] + ' <span class="b-kat-antal">' + lista.length + "</span></h3><ul>";
+      lista.forEach(function (t) {
+        var adress = INST.webbadress.replace(/\/$/, "") + "/" + t.slug + "/";
+        var arkiv = t.slutdatum && idag > t.slutdatum;
+        var datum = visaDatum(tavlansDatum(t));
+        h += '<li class="b-listrad">' +
+          '<div class="b-listtext"><a href="' + esc(adress) + '" target="_blank" rel="noopener" class="b-listrubrik">' + esc(t.rubrik) + "</a>" +
+          (t.underrubrik ? '<span class="b-listunder">' + esc(t.underrubrik) + "</span>" : "") +
+          '<span class="b-listmeta">' + [datum, t.antalPoster + " poster", t.slug].filter(Boolean).map(esc).join(" · ") +
+          (arkiv ? ' <span class="b-arkivmarkering">Arkiverad</span>' : "") + "</span></div>" +
+          '<div class="b-listknappar">' +
+          '<button type="button" class="b-knapp liten" data-lista="redigera" data-slug="' + esc(t.slug) + '">Redigera</button>' +
+          '<button type="button" class="b-knapp liten" data-lista="mall" data-slug="' + esc(t.slug) + '">Använd som mall</button>' +
+          "</div></li>";
+      });
+      h += "</ul></section>";
+    });
+    r.innerHTML = h || '<p class="b-hint">' + (allaTavlor.length ? "Inga tavlor matchar sökningen." : "Inga publicerade tavlor ännu.") + "</p>";
+  }
+
+  function laddaTavellista() {
+    var r = $("#b-lista-innehall");
+    fetch(INST.webbadress.replace(/\/$/, "") + "/tavlor.json", { cache: "no-store" })
+      .then(function (svar) { if (!svar.ok) throw new Error(); return svar.json(); })
+      .then(function (data) { allaTavlor = data.tavlor || []; ritaTavellista(); })
+      .catch(function () {
+        r.innerHTML = '<p class="b-hint">Listan kunde inte hämtas. Den visas när byggaren och tavlorna ligger på Netlify.</p>';
+      });
+    $("#b-lista-sok").addEventListener("input", ritaTavellista);
+    r.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-lista]");
+      if (!b) return;
+      $("#b-start-fel").textContent = "";
+      b.disabled = true;
+      var adress = INST.webbadress.replace(/\/$/, "") + "/" + b.getAttribute("data-slug") + "/";
+      hamtaFranAdress(adress, b.getAttribute("data-lista")).catch(function (err) {
+        b.disabled = false;
+        $("#b-start-fel").textContent = err.message || String(err);
+        $("#b-start-fel").scrollIntoView({ block: "center" });
+      });
+    });
+  }
+
   /* ---------- Start ---------- */
 
   function starta() {
@@ -807,6 +887,7 @@
     });
     $('[data-start="ny"]').addEventListener("click", function () { state = nyttState(); state.slug = ""; starta(); });
 
+    laddaTavellista();
     kopplaRedigering();
     document.querySelectorAll(".b-flik").forEach(function (f) { f.addEventListener("click", function () { visaFlik(f.getAttribute("data-flik")); }); });
     $("#b-ladda-ner").addEventListener("click", laddaNerTavla);
