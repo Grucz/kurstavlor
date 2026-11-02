@@ -12,12 +12,14 @@
   var esc = KT.esc;
 
   var MAX_FIL = 25 * 1024 * 1024;   // GitHubs gräns vid uppladdning i webbläsaren
+  var MAX_PUBLICERA = 4 * 1024 * 1024; // Netlifys funktioner tar emot cirka 6 MB, inklusive omkodning
   var VARNA_FIL = 10 * 1024 * 1024; // stora filer drar Netlify-krediter vid nedladdning
   var BILD_MAX_BREDD = 1000;
   // Funktionen på Netlify som hämtar förhandsbilder (se netlify/functions/forhandsbild.mjs).
   // På Netlify används relativa adresser, så att webbläsaren skickar med lösenordet.
   var BYGG_BAS = /^https?:$/.test(location.protocol) ? "/bygg/" : INST.webbadress.replace(/\/$/, "") + "/bygg/";
   var FORHANDSBILD_API = BYGG_BAS + "api/forhandsbild";
+  var PUBLICERA_API = BYGG_BAS + "api/publicera";
   // Sajtens adress: den byggaren körs på, annars adressen i profiler.js.
   var SAJT = /^https?:$/.test(location.protocol) ? location.origin : INST.webbadress.replace(/\/$/, "");
   var KALLNAMN = { youtube: "Bild från YouTube", delningsbild: "Sidans delningsbild", skarmdump: "Skärmdump av sidan" };
@@ -613,7 +615,7 @@
 
     var knapp = $("#b-ladda-ner");
     knapp.disabled = true; knapp.textContent = "Packar...";
-    var klar = function () { knapp.disabled = false; knapp.textContent = "Ladda ner tavlan"; };
+    var klar = function () { knapp.disabled = false; knapp.textContent = "Ladda ner zip"; };
 
     var kontroll = state.lage === "redigera" ? Promise.resolve(false) : finnsTavla(state.slug);
     kontroll.then(function (finns) {
@@ -631,6 +633,113 @@
         visaKlart(b.filer.length);
       });
     }).catch(function () { klar(); alert("Något gick fel när tavlan skulle packas. Försök igen."); });
+  }
+
+  /* ---------- Publicera direkt till GitHub ---------- */
+
+  function anropaPublicera(steg, kropp, arJson) {
+    return fetch(PUBLICERA_API + "?steg=" + steg, {
+      method: "POST",
+      headers: arJson ? { "content-type": "application/json" } : { "content-type": "application/octet-stream" },
+      body: arJson ? JSON.stringify(kropp) : kropp
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        if (!r.ok) throw new Error(j.fel || (r.status === 413 ? "Filen är för stor för att publicera direkt." : "Publiceringen misslyckades (fel " + r.status + ")."));
+        return j;
+      });
+    }, function () { throw new Error("Kunde inte nå publiceringsfunktionen. Den fungerar bara när byggaren körs på Netlify."); });
+  }
+
+  // Efter publicering: nya filer blir befintliga, och fortsatt arbete blir redigering av samma tavla.
+  function efterPublicering(json) {
+    state.kategorier.forEach(function (k, ki) {
+      k.poster.forEach(function (p, pi) {
+        var pj = json.kategorier[ki].poster[pi];
+        if (p.fil && !p.fil.befintlig && pj.fil) { p.fil = { befintlig: pj.fil, namn: p.fil.namn, storlek: p.fil.storlek, url: p.fil.url }; state.befintligaFiler[pj.fil] = true; }
+        if (p.bild && !p.bild.befintlig && pj.bild) { p.bild = { befintlig: pj.bild, url: p.bild.url, kalla: p.bild.kalla }; state.befintligaFiler[pj.bild] = true; }
+      });
+    });
+    state.lage = "redigera";
+    state.slugManuell = true;
+    state.skapad = json.skapad;
+    smutsig = false;
+    $("#b-lage").textContent = "Redigerar: " + state.slug;
+    ritaRedigering();
+  }
+
+  function publiceraTavla() {
+    if (aktivFlik !== "redigera") visaFlik("redigera");
+    var fel = validera();
+    state.kategorier.forEach(function (k, ki) {
+      k.poster.forEach(function (p, pi) {
+        if (p.resurs === "fil" && p.fil && !p.fil.befintlig && p.fil.storlek > MAX_PUBLICERA && p.fil.storlek <= MAX_FIL) {
+          fel.push({ text: "Post K" + (ki + 1) + "P" + (pi + 1) + ": filen är större än 4 MB och kan inte publiceras direkt. Lägg den i Dropbox och använd länk, eller välj Ladda ner zip och ladda upp i GitHub.", mal: "#post-" + p.uid + ' [data-f="rubrik"]', kat: k });
+        }
+      });
+    });
+    if (fel.length) { visaFel(fel); return; }
+    $("#b-felruta").hidden = true;
+
+    var knapp = $("#b-publicera"), status = $("#b-status");
+    var aterstall = function () { knapp.disabled = false; knapp.textContent = "Publicera"; };
+    knapp.disabled = true; knapp.textContent = "Publicerar...";
+
+    var kontroll = state.lage === "redigera" ? Promise.resolve(false) : finnsTavla(state.slug);
+    kontroll.then(function (finns) {
+      if (finns && !confirm("Det finns redan en publicerad tavla på adressen " + state.slug + ". Den skrivs över om du fortsätter. Fortsätta ändå?")) { aterstall(); return; }
+      var b = byggJson();
+      var shas = [];
+      var i = 0;
+      return (function nastaFil() {
+        if (i >= b.filer.length) return Promise.resolve();
+        var f = b.filer[i];
+        status.textContent = "Laddar upp fil " + (i + 1) + " av " + b.filer.length + "...";
+        return anropaPublicera("fil", f.blob, false).then(function (r) {
+          shas.push({ sokvag: state.slug + "/" + f.sokvag, sha: r.sha });
+          i++;
+          return nastaFil();
+        });
+      })().then(function () {
+        status.textContent = "Sparar tavlan...";
+        return anropaPublicera("publicera", {
+          slug: state.slug,
+          filer: shas,
+          text: { "index.html": TAVLA_INDEX, "tavla.json": JSON.stringify(b.json, null, 2) + "\n" },
+          meddelande: (state.lage === "redigera" ? "Uppdatera tavla: " : "Publicera tavla: ") + state.slug
+        }, true);
+      }).then(function () {
+        status.textContent = "";
+        aterstall();
+        var varNy = state.lage !== "redigera";
+        efterPublicering(b.json);
+        visaPublicerad(varNy);
+      });
+    }).catch(function (e) {
+      status.textContent = "";
+      aterstall();
+      alert(e.message || "Publiceringen misslyckades.");
+    });
+  }
+
+  function visaPublicerad(varNy) {
+    var adress = SAJT + "/" + state.slug + "/";
+    var gammal = document.getElementById("b-klart"); if (gammal) gammal.remove();
+    var d = document.createElement("dialog");
+    d.id = "b-klart"; d.className = "kt-dialog b-klart";
+    d.innerHTML = "<h2>Tavlan är publicerad</h2>" +
+      "<p>" + (varNy ? "Tavlan" : "Ändringarna") + " syns på adressen nedan om en till två minuter, när Netlify har publicerat klart.</p>" +
+      "<p>Du kan fortsätta ändra och klicka på Publicera igen. Varje publicering kostar 15 Netlify-krediter, så samla gärna ihop flera ändringar.</p>" +
+      '<div class="kt-rad"><input type="text" readonly value="' + esc(adress) + '"></div>' +
+      '<div class="kt-rad kt-rad-slut"><a class="kt-knapp sekundar" href="' + esc(adress) + '" target="_blank" rel="noopener">Öppna tavlan</a>' +
+      '<button type="button" class="kt-knapp sekundar" data-g="qr">Länk och QR-kod</button><button type="button" class="kt-knapp" data-g="stang">Stäng</button></div>';
+    document.body.appendChild(d);
+    d.addEventListener("click", function (e) {
+      var g = e.target.getAttribute && e.target.getAttribute("data-g");
+      if (g === "stang" || e.target === d) d.close();
+      if (g === "qr") { d.close(); KT.visaDela(adress, state.slug); }
+    });
+    d.addEventListener("close", function () { d.remove(); });
+    d.showModal();
   }
 
   function visaKlart(antalFiler) {
@@ -827,11 +936,28 @@
           '<div class="b-listknappar">' +
           '<button type="button" class="b-knapp liten" data-lista="redigera" data-slug="' + esc(t.slug) + '">Redigera</button>' +
           '<button type="button" class="b-knapp liten" data-lista="mall" data-slug="' + esc(t.slug) + '">Använd som mall</button>' +
+          '<button type="button" class="b-knapp liten fara" data-tabort="' + esc(t.slug) + '">Ta bort</button>' +
           "</div></li>";
       });
       h += "</ul></section>";
     });
     r.innerHTML = h || '<p class="b-hint">' + (allaTavlor.length ? "Inga tavlor matchar sökningen." : "Inga publicerade tavlor ännu.") + "</p>";
+  }
+
+  function taBortTavla(knapp) {
+    var slug = knapp.getAttribute("data-tabort");
+    var t = allaTavlor.filter(function (x) { return x.slug === slug; })[0] || { rubrik: slug };
+    if (!confirm("Ta bort tavlan \"" + t.rubrik + "\" (" + slug + ")?\n\nDen försvinner från sajten efter någon minut, och deltagarnas länkar slutar fungera. Den går att återställa via historiken i GitHub.")) return;
+    knapp.disabled = true; knapp.textContent = "Tar bort...";
+    anropaPublicera("tabort", { slug: slug }, true).then(function () {
+      allaTavlor = allaTavlor.filter(function (x) { return x.slug !== slug; });
+      ritaTavellista();
+      $("#b-start-fel").textContent = "Tavlan " + slug + " är borttagen.";
+    }, function (e) {
+      knapp.disabled = false; knapp.textContent = "Ta bort";
+      $("#b-start-fel").textContent = e.message;
+      $("#b-start-fel").scrollIntoView({ block: "center" });
+    });
   }
 
   function laddaTavellista() {
@@ -844,6 +970,8 @@
       });
     $("#b-lista-sok").addEventListener("input", ritaTavellista);
     r.addEventListener("click", function (e) {
+      var tb = e.target.closest("[data-tabort]");
+      if (tb) { taBortTavla(tb); return; }
       var b = e.target.closest("[data-lista]");
       if (!b) return;
       $("#b-start-fel").textContent = "";
@@ -895,6 +1023,7 @@
     kopplaRedigering();
     document.querySelectorAll(".b-flik").forEach(function (f) { f.addEventListener("click", function () { visaFlik(f.getAttribute("data-flik")); }); });
     $("#b-ladda-ner").addEventListener("click", laddaNerTavla);
+    $("#b-publicera").addEventListener("click", publiceraTavla);
     $("#b-borja-om").addEventListener("click", function () {
       if (smutsig && !confirm("Börja om? Det du inte laddat ner försvinner.")) return;
       smutsig = false; location.reload();

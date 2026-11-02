@@ -30,6 +30,8 @@ body.byggare.visar-forhand { background: var(--sida-monster), var(--sida-bg); }
 .b-flik.aktiv { background: var(--b-yta); color: var(--b-text); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); }
 .b-topp-hoger { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
 .b-lage { font-size: 0.85rem; color: var(--b-svag); }
+.b-status { font-size: 0.85rem; font-weight: 600; }
+.b-klart a.kt-knapp { text-decoration: none; }
 
 .b-knapp {
   display: inline-flex; align-items: center; gap: 0.4rem;
